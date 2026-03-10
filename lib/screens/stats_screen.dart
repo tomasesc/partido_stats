@@ -6,7 +6,15 @@ import 'package:provider/provider.dart';
 import '../app_state.dart';
 
 // Imports para el CSV
-import 'dart:io';
+// dart:io doesn't work on web; conditional code will avoid using it there.
+// We need to import html for web downloads.
+// dart:io is only used in non-web branches; it doesn't hurt during web compile
+// because we only reference File inside a kIsWeb check.
+import 'dart:io' show File;
+import 'dart:convert' show utf8;
+import 'package:flutter/foundation.dart' show kIsWeb;
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -465,7 +473,8 @@ class StatsScreen extends StatelessWidget {
       appState.getStatT1(StatKeys.noGolPena9m),
     ]);
     rows.add(['']);
-    // detalle de no-gol para Pena
+    // encabezado de detalle de no-gol para Peña (corrección de acento)
+    rows.add(['No Gol Detalle Peña']);
     rows.add(['- Afuera (Peña)', appState.getStatT1(StatKeys.noGolPenaAfuera)]);
     rows.add(['- Palo (Peña)', appState.getStatT1(StatKeys.noGolPenaPalo)]);
     rows.add(['- Pisa (Peña)', appState.getStatT1(StatKeys.noGolPenaPisa)]);
@@ -502,7 +511,7 @@ class StatsScreen extends StatelessWidget {
     rows.add(['Pelotas Perdidas (Peña) - No forzada', pelotaPerdidasNoForzT1]);
     rows.add(['Pelotas Recuperadas (Peña) - Forzada', pelotaRecupForzT1]);
     rows.add(['Pelotas Recuperadas (Peña) - No forzada', pelotaRecupNoForzT1]);
-    rows.add(['Exclusiones (Peña)', exclusionesT1Pena]);
+    rows.add(['Exclusiones Peña', exclusionesT1Pena]);
     rows.add(['Exclusiones (Rival)', exclusionesT1Rival]);
     rows.add(['']);
     rows.add(['---', '---', '---']);
@@ -532,6 +541,7 @@ class StatsScreen extends StatelessWidget {
       appState.getStatT2(StatKeys.noGolPena9m),
     ]);
     rows.add(['']);
+    rows.add(['No Gol Detalle Peña']);
     rows.add(['- Afuera (Peña)', appState.getStatT2(StatKeys.noGolPenaAfuera)]);
     rows.add(['- Palo (Peña)', appState.getStatT2(StatKeys.noGolPenaPalo)]);
     rows.add(['- Pisa (Peña)', appState.getStatT2(StatKeys.noGolPenaPisa)]);
@@ -568,7 +578,7 @@ class StatsScreen extends StatelessWidget {
     rows.add(['Pelotas Perdidas (Peña) - No forzada', pelotaPerdidasNoForzT2]);
     rows.add(['Pelotas Recuperadas (Peña) - Forzada', pelotaRecupForzT2]);
     rows.add(['Pelotas Recuperadas (Peña) - No forzada', pelotaRecupNoForzT2]);
-    rows.add(['Exclusiones (Peña)', exclusionesT2Pena]);
+    rows.add(['Exclusiones Peña', exclusionesT2Pena]);
     rows.add(['Exclusiones (Rival)', exclusionesT2Rival]);
     rows.add(['']);
     rows.add(['---', '---', '---']);
@@ -737,8 +747,28 @@ class StatsScreen extends StatelessWidget {
     // --- 3. Convertir y Guardar ---
     final String csvString = const ListToCsvConverter().convert(rows);
 
+    if (kIsWeb) {
+      // On web we can't use path_provider or share_plus; instead create a blob
+      // and trigger a download.
+      final bytes = utf8.encode(csvString);
+      final blob = html.Blob([bytes], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.document.createElement('a') as html.AnchorElement;
+      anchor.href = url;
+      anchor.download = 'stats_partido.csv';
+      anchor.style.display = 'none';
+      html.document.body!.children.add(anchor);
+      anchor.click();
+      html.document.body!.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('CSV descargado')));
+      return;
+    }
+
     try {
-      final Directory tempDir = await getTemporaryDirectory();
+      final tempDir = await getTemporaryDirectory();
       final String filePath = '${tempDir.path}/stats_partido.csv';
       final File file = File(filePath);
       await file.writeAsString(csvString);
@@ -844,7 +874,7 @@ class _BuildTableColumn extends StatelessWidget {
           _DataRow(text: '7 Metros', val1: Pena7m, val2: PenaNo7m),
           _DataRow(text: '9 Metros', val1: Pena9m, val2: PenaNo9m),
           // detalle no gol
-          _TitleCell('No Gol Detalle Pena'),
+          _TitleCell('No Gol Detalle Peña'),
           _DataRowSingle(text: 'Afuera', val1: PenaAfuera),
           _DataRowSingle(text: 'Palo', val1: PenaPalo),
           _DataRowSingle(text: 'Pisa', val1: PenaPisa),
@@ -873,7 +903,7 @@ class _BuildTableColumn extends StatelessWidget {
           _TitleCell('Pelotas Recuperadas'),
           _DataRowSingle(text: 'Forzada', val1: pelotaRecuperadasForzada),
           _DataRowSingle(text: 'No forzada', val1: pelotaRecuperadasNoForzada),
-          _TitleCell('Sanciones (Peña)'),
+          _TitleCell('Sanciones'),
           _DataRowSingle(text: 'Exclusiones Peña', val1: exclusionesPena),
           _DataRowSingle(text: 'Exclusiones Rival', val1: exclusionesRival),
         ],
@@ -1178,7 +1208,7 @@ class _BuildBalanceColumn extends StatelessWidget {
             color: compRecuperadas['color'],
           ),
 
-          _TitleCell('Sanciones (Peña)'),
+          _TitleCell('Sanciones'),
           _BalanceRow(
             texto: 'Exclusiones Peña',
             data: compExclusionesPena,

@@ -20,6 +20,7 @@ class NoGolAtajadaScreen extends StatelessWidget {
     // Si detalle es null significa que fue atajada;
     // en ese caso sumamos la atajada y continuamos al selector de tipo.
     if (detalle == null) {
+      // atajada: se suma la atajada y se va a elegir distancia
       if (equipo == Equipo.Pena) {
         Provider.of<AppState>(
           context,
@@ -37,41 +38,37 @@ class NoGolAtajadaScreen extends StatelessWidget {
           builder: (context) => NoGolTipoScreen(equipo: equipo),
         ),
       );
+    } else if (detalle == 'pisa') {
+      // pisa se registra y se asume 6 metros
+      String key = (equipo == Equipo.Pena)
+          ? StatKeys.noGolPenaPisa
+          : StatKeys.noGolRivalPisa;
+      Provider.of<AppState>(context, listen: false).incrementar(key);
+      // agregar distancia 6m
+      String distKey = (equipo == Equipo.Pena)
+          ? StatKeys.noGolPena6m
+          : StatKeys.noGolRival6m;
+      Provider.of<AppState>(context, listen: false).incrementar(distKey);
+      Navigator.popUntil(context, (route) => route.isFirst);
     } else {
-      // registramos el detalle (afuera/palo/pisa) para el equipo que lanzó
+      // fuera o palo: registramos detalle y luego consultamos distancia
       String key;
       if (equipo == Equipo.Pena) {
-        switch (detalle) {
-          case 'afuera':
-            key = StatKeys.noGolPenaAfuera;
-            break;
-          case 'palo':
-            key = StatKeys.noGolPenaPalo;
-            break;
-          case 'pisa':
-            key = StatKeys.noGolPenaPisa;
-            break;
-          default:
-            key = StatKeys.noGolPenaContra; // should not happen
-        }
+        key = (detalle == 'afuera')
+            ? StatKeys.noGolPenaAfuera
+            : StatKeys.noGolPenaPalo;
       } else {
-        switch (detalle) {
-          case 'afuera':
-            key = StatKeys.noGolRivalAfuera;
-            break;
-          case 'palo':
-            key = StatKeys.noGolRivalPalo;
-            break;
-          case 'pisa':
-            key = StatKeys.noGolRivalPisa;
-            break;
-          default:
-            key = StatKeys.noGolRivalContra;
-        }
+        key = (detalle == 'afuera')
+            ? StatKeys.noGolRivalAfuera
+            : StatKeys.noGolRivalPalo;
       }
       Provider.of<AppState>(context, listen: false).incrementar(key);
-      // volvemos al hub cerrando el flujo
-      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NoGolTipoScreen(equipo: equipo),
+        ),
+      );
     }
   }
 
@@ -104,7 +101,9 @@ class NoGolAtajadaScreen extends StatelessWidget {
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade600,
+                backgroundColor: (equipo == Equipo.Pena)
+                    ? Colors.yellow.shade600
+                    : Colors.green.shade600,
                 padding: const EdgeInsets.symmetric(vertical: 30),
               ),
               child: const Text('Atajada', style: TextStyle(fontSize: 24)),
@@ -115,7 +114,7 @@ class NoGolAtajadaScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade600,
+                backgroundColor: Colors.red.shade600,
                 padding: const EdgeInsets.symmetric(vertical: 30),
               ),
               child: const Text('Afuera', style: TextStyle(fontSize: 24)),
@@ -126,7 +125,7 @@ class NoGolAtajadaScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
+                backgroundColor: Colors.orange.shade600,
                 padding: const EdgeInsets.symmetric(vertical: 30),
               ),
               child: const Text('Palo', style: TextStyle(fontSize: 24)),

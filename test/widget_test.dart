@@ -28,5 +28,22 @@ void main() {
     expect(find.text('Acciones Rápidas'), findsOneWidget);
     expect(find.text('Pelota Perdida'), findsOneWidget);
     expect(find.text('Exclusión Peña'), findsOneWidget);
+
+    // navigate to statistics screen and verify a header changed
+    await tester.tap(find.text('Ver Estadísticas'));
+    await tester.pumpAndSettle();
+    expect(find.text('No Gol Detalle Peña'), findsOneWidget);
+  });
+
+  test('pisa increment logic updates both counters', () {
+    final appState = AppState();
+    // simulate a pisa fallo en el primer tiempo
+    appState.incrementar(StatKeys.noGolPenaPisa);
+    appState.incrementar(StatKeys.noGolPena6m);
+    expect(appState.getStatT1(StatKeys.noGolPenaPisa), 1);
+    expect(appState.getStatT1(StatKeys.noGolPena6m), 1);
+    // other stats should remain zero
+    expect(appState.getStatT1(StatKeys.noGolPenaAfuera), 0);
+  });
   });
 }

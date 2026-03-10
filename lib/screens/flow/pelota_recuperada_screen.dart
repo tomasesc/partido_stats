@@ -37,7 +37,7 @@ class PelotaRecuperadaScreen extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
+                backgroundColor: Colors.green.shade600,
                 padding: const EdgeInsets.symmetric(vertical: 30),
               ),
               child: const Text('Forzada', style: TextStyle(fontSize: 24)),
