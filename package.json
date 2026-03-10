@@ -1,0 +1,27 @@
+{
+  "name": "partido_stats",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "deploy": "gh-pages -d build/web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomasesc/partido_stats.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tomasesc/partido_stats/issues"
+  },
+  "homepage": "https://github.com/tomasesc/partido_stats#readme",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
