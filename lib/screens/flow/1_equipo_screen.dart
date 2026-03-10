@@ -31,27 +31,28 @@ class EquipoScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            
-            // Botón "Pena"
+
+            // Botón "Peña"
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade600,
                 padding: const EdgeInsets.symmetric(vertical: 30),
               ),
-              child: const Text('Pena', style: TextStyle(fontSize: 24)),
+              child: const Text('Peña', style: TextStyle(fontSize: 24)),
               onPressed: () {
                 // Navegamos al Paso 2, pasando el equipo "Pena"
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ResultadoScreen(equipo: Equipo.Pena),
+                    builder: (context) =>
+                        const ResultadoScreen(equipo: Equipo.Pena),
                   ),
                 );
               },
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // Botón "Rival"
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -64,7 +65,8 @@ class EquipoScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ResultadoScreen(equipo: Equipo.rival),
+                    builder: (context) =>
+                        const ResultadoScreen(equipo: Equipo.rival),
                   ),
                 );
               },

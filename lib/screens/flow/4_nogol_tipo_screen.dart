@@ -28,7 +28,7 @@ class NoGolTipoScreen extends StatelessWidget {
       ? Colors.green.shade800 
       : Colors.red.shade800;
       
-    final String equipoNombre = (equipo == Equipo.Pena) ? "Pena" : "RIVAL";
+    final String equipoNombre = (equipo == Equipo.Pena) ? "Peña" : "RIVAL";
     
     // Definimos las claves de estadísticas correctas según el equipo
     final keys = (equipo == Equipo.Pena) 
@@ -72,11 +72,11 @@ class NoGolTipoScreen extends StatelessWidget {
               onPressed: () => _registrarFallo(context, keys['9m']!),
             ),
             _BotonTipo(
-              texto: '7 Metros (Penal)',
+              texto: '7 Metros',
               onPressed: () => _registrarFallo(context, keys['7m']!),
             ),
             _BotonTipo(
-              texto: '6 Metros (Pivote/Extremo)',
+              texto: '6 Metros',
               onPressed: () => _registrarFallo(context, keys['6m']!),
             ),
           ],

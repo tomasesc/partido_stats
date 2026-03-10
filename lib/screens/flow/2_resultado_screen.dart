@@ -21,7 +21,7 @@ class ResultadoScreen extends StatelessWidget {
       ? Colors.green.shade800 
       : Colors.red.shade800;
       
-    final String equipoNombre = (equipo == Equipo.Pena) ? "Pena" : "RIVAL";
+    final String equipoNombre = (equipo == Equipo.Pena) ? "Peña" : "RIVAL";
 
     return Scaffold(
       appBar: AppBar(

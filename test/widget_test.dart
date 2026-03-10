@@ -5,26 +5,28 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
+// 'material.dart' isn't needed directly in this test
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+
+// import app state for provider
+import 'package:partido_stats/app_state.dart';
 
 import 'package:partido_stats/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    // Build our app with the provider, as main does.
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => AppState(),
+        child: const MyApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // The home screen should show some of the expected labels.
+    expect(find.text('Acciones Rápidas'), findsOneWidget);
+    expect(find.text('Pelota Perdida'), findsOneWidget);
+    expect(find.text('Exclusión Peña'), findsOneWidget);
   });
 }

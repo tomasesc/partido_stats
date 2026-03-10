@@ -6,7 +6,10 @@ import '../app_state.dart'; // Importamos el cerebro
 
 // Importamos la primera pantalla del flujo de lanzamiento
 // MARCARÁ ERROR, es normal, la crearemos en el Paso 6
-import 'flow/1_equipo_screen.dart'; 
+import 'flow/1_equipo_screen.dart';
+// nuevas pantallas para pelotas forzadas/no forzadas
+import 'flow/pelota_perdida_screen.dart';
+import 'flow/pelota_recuperada_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,38 +20,39 @@ class HomeScreen extends StatelessWidget {
     // cuando cambiemos de periodo.
     return Consumer<AppState>(
       builder: (context, appState, child) {
-        
-        final periodo = (appState.periodoActual == Periodo.primero) 
-          ? "PRIMER TIEMPO" 
-          : "SEGUNDO TIEMPO";
-          
+        final periodo = (appState.periodoActual == Periodo.primero)
+            ? "PRIMER TIEMPO"
+            : "SEGUNDO TIEMPO";
+
         final esPrimerTiempo = appState.periodoActual == Periodo.primero;
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text('Estadísticas - $periodo'),
-          ),
+          appBar: AppBar(title: Text('Estadísticas - $periodo')),
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  
                   // --- BOTONES DE ACCIÓN RÁPIDA ---
                   Text(
-                    'Acciones Rápidas', 
-                    style: Theme.of(context).textTheme.headlineSmall
+                    'Acciones Rápidas',
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
-                  
+
                   _BotonAccionRapida(
                     texto: 'Pelota Perdida',
                     icono: Icons.arrow_downward,
                     color: Colors.orange,
                     onPressed: () {
-                      appState.incrementar(StatKeys.pelotaPerdida);
-                      _mostrarSnackbar(context, 'Pelota Perdida (+1)');
+                      // navegamos a la pantalla de detalle forzado/no
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PelotaPerdidaScreen(),
+                        ),
+                      );
                     },
                   ),
                   _BotonAccionRapida(
@@ -56,26 +60,39 @@ class HomeScreen extends StatelessWidget {
                     icono: Icons.arrow_upward,
                     color: Colors.green,
                     onPressed: () {
-                      appState.incrementar(StatKeys.pelotaRecuperada);
-                      _mostrarSnackbar(context, 'Pelota Recuperada (+1)');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PelotaRecuperadaScreen(),
+                        ),
+                      );
                     },
                   ),
                   _BotonAccionRapida(
-                    texto: 'Exclusión',
+                    texto: 'Exclusión Peña',
                     icono: Icons.timer,
                     color: Colors.yellow.shade700,
                     onPressed: () {
-                      appState.incrementar(StatKeys.exclusion);
-                      _mostrarSnackbar(context, 'Exclusión (+1)');
+                      appState.incrementar(StatKeys.exclusionPena);
+                      _mostrarSnackbar(context, 'Exclusión Peña (+1)');
                     },
                   ),
-                  
+                  _BotonAccionRapida(
+                    texto: 'Exclusión Rival',
+                    icono: Icons.timer,
+                    color: Colors.yellow.shade700,
+                    onPressed: () {
+                      appState.incrementar(StatKeys.exclusionRival);
+                      _mostrarSnackbar(context, 'Exclusión Rival (+1)');
+                    },
+                  ),
+
                   const SizedBox(height: 24),
                   const Divider(color: Colors.white24, thickness: 1),
                   const SizedBox(height: 16),
-                  
+
                   // --- BOTONES DE NAVEGACIÓN ---
-                  
+
                   // Botón de Lanzamiento (inicia el flujo)
                   ElevatedButton.icon(
                     icon: const Icon(Icons.ads_click, size: 28),
@@ -94,9 +111,9 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Botón de Ver Estadísticas
                   ElevatedButton.icon(
                     icon: const Icon(Icons.bar_chart, size: 28),
@@ -111,7 +128,7 @@ class HomeScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 30),
-                  
+
                   // Botón de Pasar a 2do Tiempo
                   if (esPrimerTiempo) // Solo se muestra en el primer tiempo
                     ElevatedButton(
@@ -125,7 +142,9 @@ class HomeScreen extends StatelessWidget {
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text('Confirmar'),
-                            content: const Text('¿Seguro que quieres pasar al segundo tiempo? Esta acción no se puede deshacer.'),
+                            content: const Text(
+                              '¿Seguro que quieres pasar al segundo tiempo? Esta acción no se puede deshacer.',
+                            ),
                             actions: [
                               TextButton(
                                 child: const Text('Cancelar'),
@@ -143,7 +162,6 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                     ),
-
                 ],
               ),
             ),
@@ -159,10 +177,7 @@ class HomeScreen extends StatelessWidget {
   void _mostrarSnackbar(BuildContext context, String mensaje) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        duration: const Duration(seconds: 1),
-      ),
+      SnackBar(content: Text(mensaje), duration: const Duration(seconds: 1)),
     );
   }
 }
